@@ -8,6 +8,7 @@ from PyQt5 import QtCore, QtWidgets
 import moviepy.editor as editor
 
 from constants import SETTINGS_FILE, SENDING_TMP_FILE
+from file_list_widget import FileListWidget
 from settings import PROJECT_LIST, RENDER_BOT_ID, ARDENA_BOT_ID, BOT_TOKEN, TEST_MODE, BOT_ID
 from window import Ui_MainWindow
 
@@ -61,7 +62,13 @@ class Messanger(ThreadQueue):
 
         file_path = os.path.join(tempfile.gettempdir(), SETTINGS_FILE)
         self.settings = QtCore.QSettings(file_path, QtCore.QSettings.IniFormat)
+
+        self.ui.file_list_widget = FileListWidget([])
+
+        self.ui.path_layout.insertWidget(0, self.ui.file_list_widget)
+
         self.ui.progressBar.hide()
+
 
         self.window.show()
         self.load_settings()
@@ -77,8 +84,10 @@ class Messanger(ThreadQueue):
 
         if not file_path:
             return
-        # self.ui.path_line_edit.setText(file_path)
-        # self.settings.setValue('video_folder', file_path)
+
+        self.ui.file_list_widget.create_item(file_path, file_path)
+        self.settings.setValue('video_folder', file_path)
+
 
     def clear_fields(self):
         self.ui.path_line_edit.clear()
@@ -119,7 +128,7 @@ class Messanger(ThreadQueue):
 
             bot = telepot.Bot(BOT_TOKEN)
             with open(file_path, 'rb') as f:
-                bot.sendVideo(RENDER_BOT_ID, f, caption=data['message'] )
+                bot.sendVideo(RENDER_BOT_ID, f, caption=data['message'])
 
             if data['project'] == PROJECT_LIST[0]:
                 with open(file_path, 'rb') as f:

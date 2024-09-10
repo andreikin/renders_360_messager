@@ -1,5 +1,5 @@
-@pyuic5 window.ui -o window.py -x
-@pyrcc5  resource.qrc -o resource_rc.py
+@venv\Scripts\pyuic5 window.ui -o window.py -x
+@venv\Scripts\pyrcc5 resource.qrc -o resource_rc.py
 
  
 

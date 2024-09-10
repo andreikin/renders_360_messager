@@ -44,7 +44,7 @@ class FileListWidget(QListView):
         self.setModel(self.model)
         self.setStyleSheet("QListView {padding: 10px 10px 2px 20px;"
                            "border-radius: 5px;"
-                           "background-color:#1f232a;}"
+                           "background-color:  rgb(27, 29, 35);}"
                            "QListView:item {"
                            "color:#fff;"
                            "height: " + str(self.item_height) + "px;}")
@@ -63,11 +63,11 @@ class FileListWidget(QListView):
         except Exception as message:
             print(message)
 
-    def create_item(self, file_path):
+    def create_item(self, file_path, label):
         try:
             if not self.is_file_in_widget(file_path):
-                file_name = os.path.basename(file_path)
-                label = file_name if len(file_name) < 30 else file_name[:29] + "..."
+                # file_name = os.path.basename(file_path)
+                # label = file_name if len(file_name) < 30 else file_name[:29] + "..."
                 item = QStandardItem(label)
                 item.setData(file_path, role=Qt.ToolTipRole)
                 self.model.appendRow(item)
@@ -80,11 +80,11 @@ class FileListWidget(QListView):
         return file in self.get_list()
 
     def add_file(self, file_path):
-        self.create_item(file_path)
+        self.create_item(file_path, file_path)
 
     def add_files_list(self, files_list):
         for file_path in files_list:
-            self.create_item(file_path)
+            self.create_item(file_path, file_path)
 
     def get_list(self):
         path_list = []
@@ -135,14 +135,14 @@ class FileListWidget(QListView):
                 event.ignore()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import sys
     app = QtWidgets.QApplication(sys.argv)
 
-    f_list = ['ghjfghjfg', "fkjfkf", "ghgkghjkgh"]
+    f_list = ['D:/03_andrey/py_progects/renders_360_messager/settings.py' ]
 
     window = FileListWidget(f_list) # Создаем экземпляр класса
-    window.setWindowTitle("ООП-стиль создания окна")
-    window.resize(500, 70)
+    window.setWindowTitle('ООП-стиль создания окна')
+    #window.resize(500, 70)
     window.show() # Отображаем окно
     sys.exit(app.exec_()) # Запускаем цикл обработки событий
