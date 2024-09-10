@@ -74,10 +74,11 @@ class Messanger(ThreadQueue):
         file_path, _ = QtWidgets.QFileDialog.getOpenFileName(self.window, "Select file", saved_dir,
                                                              "MP4 Video Files (*.mp4)", None,
                                                              QtWidgets.QFileDialog.DontConfirmOverwrite)
+
         if not file_path:
             return
-        self.ui.path_line_edit.setText(file_path)
-        self.settings.setValue('video_folder', file_path)
+        # self.ui.path_line_edit.setText(file_path)
+        # self.settings.setValue('video_folder', file_path)
 
     def clear_fields(self):
         self.ui.path_line_edit.clear()
