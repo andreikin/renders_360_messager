@@ -9,10 +9,15 @@ import moviepy.editor as editor
 
 from constants import SETTINGS_FILE, SENDING_TMP_FILE
 from file_list_widget import FileListWidget
-from settings import PROJECT_LIST, RENDER_BOT_ID, ARDENA_BOT_ID, BOT_TOKEN, TEST_MODE, BOT_ID
+from settings import PROJECT_LIST, RENDER_BOT_ID, ARDENA_BOT_ID, TEST_MODE, BOT_ID
 from window import Ui_MainWindow
 
 import telepot
+from environs import Env
+
+env = Env()  # Создаем экземпляр класса Env
+env.read_env()  # Методом read_env() читаем файл .env и загружаем из него переменные в окружение
+BOT_TOKEN = env('BOT_TOKEN')  # Получаем и сохраняем значение переменной окружения в переменную
 
 if TEST_MODE:
     ARDENA_BOT_ID = BOT_ID
