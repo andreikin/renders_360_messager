@@ -2,10 +2,13 @@
 import os
 import queue
 import tempfile
+import types
 from pathlib import Path
+from pprint import pprint
 
 from PyQt5 import QtCore, QtWidgets
 import moviepy.editor as editor
+from telepot.namedtuple import InputMediaVideo
 
 from constants import SETTINGS_FILE, SENDING_TMP_FILE
 from file_list_widget import FileListWidget
@@ -103,41 +106,63 @@ class Messanger(ThreadQueue):
         text = self.ui.message_text_edit.toPlainText()
         text = text + "\n" if text else ""
         asset = self.ui.name_line_edit.text()
-        data = {'file_path': self.ui.path_line_edit.text()}
+
+
+        data = {'file_path': self.ui.file_list_widget.get_list()}
+
+
         if not asset or not data['file_path']:
             print("The asset or file name being sent is not specified.")
             self.ui.name_line_edit.setPlaceholderText('Enter the asset name here')
-            self.ui.path_line_edit.setPlaceholderText('Specify the path to the video file')
+        #     self.ui.path_line_edit.setPlaceholderText('Specify the path to the video file')
             return
 
         data['project'] = self.ui.project_combo_box.currentText()
         wareframe = '#wareframe' if self.ui.wareframe_check_box.isChecked() else ""
         data['message'] = f'{text}{data["project"]} #{asset} {wareframe}'
+
+        pprint(data)
+
         return data
 
     def run_thread(self):
-        data = self.get_data()
-        if not data:
-            return
+        data = {}
+        # data = self.get_data()
+        # if not data:
+        #     return
         self.add_task(lambda: self.send_message(data))
-        self.clear_fields()
+        # self.clear_fields()
 
     def send_message(self, data):
         try:
-            file_path = data['file_path']
-            if self.is_file_larger_than_45mb(file_path):
-                new_name = os.path.join(tempfile.gettempdir(), SENDING_TMP_FILE)
-                clip = editor.VideoFileClip(file_path)
-                clip.write_videofile(new_name)
-                file_path = new_name
+            # file_path = data['file_path']
+            # if self.is_file_larger_than_45mb(file_path):
+            #     new_name = os.path.join(tempfile.gettempdir(), SENDING_TMP_FILE)
+            #     clip = editor.VideoFileClip(file_path)
+            #     clip.write_videofile(new_name)
+            #     file_path = new_name
 
             bot = telepot.Bot(BOT_TOKEN)
-            with open(file_path, 'rb') as f:
-                bot.sendVideo(RENDER_BOT_ID, f, caption=data['message'])
+            file_path = 'C:/Users/avbeliaev/Desktop/video_2024-06-27_09-41-42.mp4'
 
-            if data['project'] == PROJECT_LIST[0]:
-                with open(file_path, 'rb') as f:
-                    bot.sendVideo(ARDENA_BOT_ID, f, caption=data['message'])
+            # medias = [types.InputMediaPhoto('https://habrastorage.org/webt/61/99/de/6199de8312758776787774.png'),types.InputMediaPhoto(
+            #               'https://habrastorage.org/getpro/habr/upload_files/1fd/40a/c44/1fd40ac441a0aee55fc90e67997437af.png')]
+
+            f_media = InputMediaVideo()
+
+
+
+            print (f_media)
+            #bot.sendMediaGroup(RENDER_BOT_ID, media=[f_media, f_media])
+
+
+            # bot = telepot.Bot(BOT_TOKEN)
+            # with open(file_path, 'rb') as f:
+            #     bot.sendVideo(RENDER_BOT_ID, f, caption=data['message'])
+            #
+            # if data['project'] == PROJECT_LIST[0]:
+            #     with open(file_path, 'rb') as f:
+            #         bot.sendVideo(ARDENA_BOT_ID, f, caption=data['message'])
 
         except Exception as message:
             print(message)

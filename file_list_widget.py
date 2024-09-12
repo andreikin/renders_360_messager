@@ -15,7 +15,7 @@ class DeleteItemButton(QWidget):
 
         self.button = QPushButton("x")
         self.button.clicked.connect(self.btn_function)
-        self.button.setFixedSize(self.in_widget.item_height-2, self.in_widget.item_height-2, )
+        self.button.setFixedSize(self.in_widget.item_height, self.in_widget.item_height, )
         layout.addWidget(self.button, alignment=Qt.AlignRight | Qt.AlignVCenter)
         layout.setContentsMargins(0, 0, 5, 0)
         self.button.setStyleSheet("background-color:#1f232a; color:#fff;")
@@ -48,6 +48,10 @@ class FileListWidget(QListView):
                            "QListView:item {"
                            "color:#fff;"
                            "height: " + str(self.item_height) + "px;}")
+
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+
         if files_list:
             self.add_files_list(files_list)
         self.set_height()
