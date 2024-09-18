@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>642</width>
-    <height>375</height>
+    <width>591</width>
+    <height>486</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -154,6 +154,12 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
     </item>
     <item>
      <widget class="QPlainTextEdit" name="message_text_edit">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>76</height>
+       </size>
+      </property>
       <property name="styleSheet">
        <string notr="true">	font: normal 12pt &quot;Segoe UI&quot;;
 	text-align: center;
@@ -219,16 +225,59 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
          <number>7</number>
         </property>
         <item>
-         <widget class="QPushButton" name="path_button">
+         <widget class="QFrame" name="frame">
           <property name="minimumSize">
            <size>
-            <width>100</width>
-            <height>0</height>
+            <width>0</width>
+            <height>50</height>
            </size>
           </property>
-          <property name="text">
-           <string>add file</string>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
           </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QPushButton" name="clear_button">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>clear form</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="path_button">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>add file</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>
@@ -260,6 +309,19 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
        </widget>
       </item>
      </layout>
+    </item>
+    <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
     </item>
     <item>
      <widget class="QPushButton" name="messaje_button">

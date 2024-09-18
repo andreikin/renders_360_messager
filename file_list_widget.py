@@ -1,152 +1,151 @@
-import os
+import sys
 
-from PyQt5 import QtWidgets
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QListView, QWidget, QHBoxLayout, QPushButton, QAbstractItemView
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QWidget, QListWidget, QListWidgetItem, QPushButton, QLabel, QHBoxLayout, \
+    QVBoxLayout
+
+from constants import FILE_LIST_ROW_HEIGHT
 
 
-class DeleteItemButton(QWidget):
-    def __init__(self, in_item, in_widget, parent=None):
-        super(DeleteItemButton, self).__init__(parent)
-        self.in_widget = in_widget
-        self.item = in_item
-        layout = QHBoxLayout(self)
+class FileItemWidget(QWidget):
+    def __init__(self, text, parent=None):
+        super().__init__(parent)
 
-        self.button = QPushButton("x")
-        self.button.clicked.connect(self.btn_function)
-        self.button.setFixedSize(self.in_widget.item_height, self.in_widget.item_height, )
-        layout.addWidget(self.button, alignment=Qt.AlignRight | Qt.AlignVCenter)
-        layout.setContentsMargins(0, 0, 5, 0)
-        self.button.setStyleSheet("background-color:#1f232a; color:#fff;")
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.delete_button = QPushButton("x")
+        self.delete_button.setFixedSize(30, FILE_LIST_ROW_HEIGHT)
+        self.label = QLabel(text)
+        layout.addWidget(self.delete_button)
+        layout.addWidget(self.label)
+        self.setLayout(layout)
+        css = '''   QPushButton {	
+                        color:#fff;
+                        background-color: #272a33;
+                        font: normal 12pt "Segoe UI";
+                        border: none;
+                        }
+                    QPushButton:hover {
+                        color: #40a7e3;
+                        }
+                    QLabel{color:#fff;
+                        background-color:  #272a33;
+                        font: normal 12pt "Segoe UI";
+                        }
+                    '''
+        self.setStyleSheet(css)
 
 
-    def btn_function(self):
-        try:
-            self.in_widget.model.removeRow(self.item.row())
-            self.in_widget.set_height()
-
-        except Exception as message:
-            print(message)
-
-class FileListWidget(QListView):
-    """
-    class creates a list of files with a button to delete each of them
-    """
-
-    def __init__(self, files_list, parent=None):
-        super(FileListWidget, self).__init__(parent=parent)
-        self.setDragDropMode(QAbstractItemView.DragDrop)
-        self.item_height = 30
-        self.min_height = self.item_height * 2
-        self.model = QStandardItemModel(self)
-
-        self.setModel(self.model)
-        self.setStyleSheet("QListView {padding: 10px 10px 2px 20px;"
-                           "border-radius: 5px;"
-                           "background-color:  rgb(27, 29, 35);}"
-                           "QListView:item {"
-                           "color:#fff;"
-                           "height: " + str(self.item_height) + "px;}")
-
+class FileListWidget(QListWidget):
+    def __init__(self, ):
+        super().__init__()
+        self.setAcceptDrops(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
-
-        if files_list:
-            self.add_files_list(files_list)
-        self.set_height()
-
-    def remove_item(self, file_path):
-        try:
-            for index in range(self.model.rowCount()):
-                item = self.model.item(index)
-                path = item.data(role=Qt.ToolTipRole)
-                if file_path == path:
-                    self.model.removeRow(item.row())
-                    self.set_height()
-        except Exception as message:
-            print(message)
-
-    def create_item(self, file_path, label):
-        try:
-            if not self.is_file_in_widget(file_path):
-                # file_name = os.path.basename(file_path)
-                # label = file_name if len(file_name) < 30 else file_name[:29] + "..."
-                item = QStandardItem(label)
-                item.setData(file_path, role=Qt.ToolTipRole)
-                self.model.appendRow(item)
-                self.setIndexWidget(item.index(), DeleteItemButton(item, self))
-                self.set_height()
-        except Exception as message:
-            print(message)
-
-    def is_file_in_widget(self, file):
-        return file in self.get_list()
-
-    def add_file(self, file_path):
-        self.create_item(file_path, file_path)
-
-    def add_files_list(self, files_list):
-        for file_path in files_list:
-            self.create_item(file_path, file_path)
-
-    def get_list(self):
-        path_list = []
-        for index in range(self.model.rowCount()):
-            item = self.model.item(index)
-            path_list.append(item.data(role=Qt.ToolTipRole))
-        return path_list
-
-    def set_height(self):
-        """
-        sets the height of the widget according to the amount of content
-        """
-        files_list = self.get_list()
-        content_height = len(files_list) * self.item_height
-        if self.min_height < content_height + 20:
-            self.setFixedHeight(content_height + 20)
-        else:
-            self.setFixedHeight(self.min_height + 20)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.update_height()
+        self.setStyleSheet("QListWidget {padding: 10px 10px 2px 20px;"
+                           "border-radius: 5px;"
+                           "background-color:  #272a33;}")
 
     def clear(self):
-        self.model.clear()
-        self.set_height()
+        super().clear()
+        self.update_height()
 
-    def dropEvent(self, event):
-        mimedata = event.mimeData()
-        if mimedata.hasUrls():
-            for f in mimedata.urls():
-                self.add_file(f.path()[1:])
+    def update_height(self):
+        items_number = len(self.get_data())
+        height = max(FILE_LIST_ROW_HEIGHT * 2, FILE_LIST_ROW_HEIGHT * (items_number+1))
+        self.setFixedHeight(height)
+
+    def create_item(self, text):
+        list_item = QListWidgetItem(self)
+        item_widget = FileItemWidget(text)
+        list_item.setSizeHint(item_widget.sizeHint())
+        self.setItemWidget(list_item, item_widget)
+        list_item.setData(Qt.UserRole, text)
+        item_widget.delete_button.clicked.connect(lambda: self.remove_list_item(list_item))
+        self.update_height()
+
+    def remove_list_item(self, list_item):
+        row = self.row(list_item)
+        self.takeItem(row)
+        self.update_height()
+
+    def get_data(self):
+        """
+        Method to get all file paths
+        """
+        paths = []
+        for index in range(self.count()):
+            list_item = self.item(index)
+            file_path = list_item.data(Qt.UserRole)
+            paths.append(file_path)
+        return paths
 
     def dragEnterEvent(self, event):
-        if event.source() is self:
-            event.ignore()
+        """
+        Allow drops only for files
+        """
+        if event.mimeData().hasUrls():
+            event.accept()
         else:
-            mimedata = event.mimeData()
-            if mimedata.hasUrls():
-                event.accept()
-            else:
-                event.ignore()
+            event.ignore()
 
     def dragMoveEvent(self, event):
-        if event.source() is self:
-            event.ignore()
+        """
+        Allow the drop to continue if these are files
+        """
+        if event.mimeData().hasUrls():
+            event.setDropAction(Qt.CopyAction)
+            event.accept()
         else:
-            mimedata = event.mimeData()
-            if mimedata.hasUrls():
-                event.accept()
-            else:
-                event.ignore()
+            event.ignore()
+
+    def dropEvent(self, event):
+        """
+        Handling the drop event
+        """
+        if event.mimeData().hasUrls():
+            event.setDropAction(Qt.CopyAction)
+            event.accept()
+
+            urls = event.mimeData().urls()
+            for url in urls:
+                file_path = url.toLocalFile()
+                try:
+                    if file_path not in self.get_data():
+                        self.create_item(file_path)
+                        self.update_height()
+
+                except Exception as e:
+                    print(e)
+        else:
+            event.ignore()
 
 
 if __name__ == '__main__':
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
+    class MainWindow(QWidget):
+        def __init__(self):
+            super().__init__()
+            layout = QVBoxLayout()
+            self.list_widget = FileListWidget()
+            self.list_widget.setMinimumHeight(60)
+            layout.addWidget(self.list_widget)
+            self.setLayout(layout)
 
-    f_list = ['D:/03_andrey/py_progects/renders_360_messager/settings.py' ]
+            test_button = QPushButton("Показать все пути файлов")
+            test_button.clicked.connect(self.show_paths)
+            layout.addWidget(test_button)
 
-    window = FileListWidget(f_list) # Создаем экземпляр класса
-    window.setWindowTitle('ООП-стиль создания окна')
-    #window.resize(500, 70)
-    window.show() # Отображаем окно
-    sys.exit(app.exec_()) # Запускаем цикл обработки событий
+        def show_paths(self):
+            paths = self.list_widget.get_data()
+            print("Пути всех файлов:", paths)
+
+
+    app = QApplication(sys.argv)
+    # Создаем главное окно
+    window = MainWindow()
+    window.setWindowTitle("Список с удаляемыми элементами и дропом файлов")
+    window.resize(600, 400)
+    window.show()
+
+    sys.exit(app.exec_())
